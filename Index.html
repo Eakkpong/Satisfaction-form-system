@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบสร้างแบบฟอร์มประเมินความพึงพอใจ วิทยาลัยชุมชนสมุทรสาคร</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0284c7; /* น้ำเงินเข้มขึ้นนิดนึงเพื่อให้อ่านง่าย */
+      --primary-hover: #0369a1;
+      --secondary: #38bdf8;
+      --background-start: #e0f2fe; /* น้ำเงินโทนอ่อน (Light blue) */
+      --background-end: #bae6fd;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --text-main: #1e293b;
+      --text-muted: #475569;
+      --danger: #ef4444;
+      --success: #10b981;
+      --shadow: 0 10px 40px -10px rgba(14, 165, 233, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Prompt', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      line-height: 1.6; /* ปรับระยะห่างบรรทัดให้อ่านง่ายขึ้น */
+      word-break: break-word; /* ป้องกันคำตกขอบ */
+    }
+
+    .container {
+      width: 100%;
+      max-width: 850px;
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 3rem;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.6s ease-out forwards;
+      margin-bottom: 2rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo-container {
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-container img {
+      height: 100px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.2px;
+      line-height: 1.3;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      font-weight: 400;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.85rem 1.25rem;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #0f172a;
+    }
+
+    /* Switch toggle */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      padding: 1.25rem;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-row:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    .toggle-row-content {
+      flex: 1;
+    }
+
+    .toggle-row-content strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 1.05rem;
+    }
+
+    .toggle-row-content p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 54px;
+      height: 30px;
+    }
+    
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e1;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+    
+    input:focus + .slider {
+      box-shadow: 0 0 1px var(--primary);
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    /* Dynamic inputs for status */
+    .status-list {
+      margin-top: 1rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .status-list.active {
+      display: flex;
+    }
+
+    .status-item {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      animation: slideIn 0.3s ease-out forwards;
+    }
+
+    .status-item input {
+      flex: 1;
+    }
+
+    /* Template Questions Section */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .template-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .template-card:hover {
+      background: #f1f5f9;
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    .template-card input[type="checkbox"] {
+      margin-top: 0.25rem;
+      margin-right: 0.75rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .template-card label {
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1.6;
+      flex: 1;
+      color: #334155;
+      padding-top: 0.1rem;
+    }
+
+    /* Custom Questions */
+    .custom-questions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .custom-question-row {
+      display: flex;
+      gap: 0.5rem;
+      animation: slideIn 0.3s ease-out forwards;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #3b82f6);
+      color: white;
+      width: 100%;
+      padding: 1.25rem;
+      font-size: 1.15rem;
+      box-shadow: 0 10px 20px -10px rgba(14, 165, 233, 0.5);
+      border-radius: 16px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 25px -10px rgba(14, 165, 233, 0.6);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-outline {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      padding: 0.6rem 1.25rem;
+    }
+
+    .btn-outline:hover {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .btn-icon {
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+      padding: 0.75rem;
+    }
+    
+    .btn-icon:hover {
+      background: #fca5a5;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    /* Result Section */
+    .result-section {
+      display: none;
+      margin-top: 2rem;
+      padding-top: 2.5rem;
+      border-top: 2px dashed #cbd5e1;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .result-card {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 20px;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.1);
+    }
+
+    .result-card h3 {
+      color: var(--success);
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+    }
+
+    .qr-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+      border: 1px solid #f1f5f9;
+    }
+
+    .qr-container img {
+      display: block;
+      width: 220px;
+      height: 220px;
+    }
+
+    .link-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      text-align: left;
+    }
+
+    .link-item {
+      background: white;
+      padding: 1.25rem;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .link-item strong {
+      color: #334155;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .link-item a {
+      color: var(--primary);
+      text-decoration: none;
+      word-break: break-all;
+      transition: color 0.2s;
+      font-weight: 500;
+    }
+
+    .link-item a:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+
+    /* Loader */
+    .loader {
+      display: none;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 1rem;
+      color: #64748b;
+      font-size: 0.9rem;
+      padding-bottom: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.5rem;
+        border-radius: 16px;
+      }
+      .template-grid {
+        grid-template-columns: 1fr;
+      }
+      .header h1 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <!-- วิธีแสดงรูปโลโก้: นำ URL ของรูปภาพจากเว็บมาใส่ใน src="..." ด้านล่าง -->
+        <!-- ตัวอย่างเช่นอัปโหลดรูปไปที่ imgbb.com แล้วเอา Direct Link มาใส่ -->
+        <img src="https://upload.wikimedia.org/wikipedia/th/thumb/a/af/Institute_of_Community_Colleges_Logo.png/200px-Institute_of_Community_Colleges_Logo.png" alt="โลโก้วิทยาลัยชุมชนสมุทรสาคร" onerror="this.src='https://via.placeholder.com/150x150.png?text=LOGO'">
+      </div>
+      <h1>ระบบสร้างแบบฟอร์มประเมิน</h1>
+      <p>วิทยาลัยชุมชนสมุทรสาคร (Samut Sakhon Community College)</p>
+    </div>
+
+    <form id="surveyForm" onsubmit="handleFormSubmit(event)">
+      <div class="form-group">
+        <label for="projectName">ชื่อโครงการ / กิจกรรม <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="projectName" class="form-control" required placeholder="เช่น โครงการพัฒนาศักยภาพชุมชน ปี 2569">
+      </div>
+
+      <div class="form-group">
+        <label for="eventDate">วันที่จัดกิจกรรม <span style="color:var(--danger)">*</span></label>
+        <input type="date" id="eventDate" class="form-control" required>
+      </div>
+
+      <div class="form-group">
+        <label for="location">สถานที่จัดกิจกรรม <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="location" class="form-control" required placeholder="เช่น ห้องประชุมวิทยาลัยชุมชนสมุทรสาคร">
+      </div>
+
+      <!-- ส่วนที่ 1: ข้อมูลทั่วไป -->
+      <div class="section-title">
+        <span>ตั้งค่าข้อมูลทั่วไปของผู้ตอบแบบสอบถาม</span>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-row-content">
+          <strong>ถาม "เพศ"</strong>
+          <p>ชาย, หญิง, ไม่ระบุ</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleGender" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-row-content">
+          <strong>ถาม "ช่วงอายุ"</strong>
+          <p>ต่ำกว่า 18 ปี, 18-25, 26-35, 36-45, 46-55, 56 ปีขึ้นไป</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleAge" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <div class="toggle-row-content">
+          <strong>ถาม "สถานภาพ"</strong>
+          <p>สามารถปรับแต่งตัวเลือกด้านล่างได้</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleStatus" checked onchange="toggleStatusList()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="status-list active" id="statusListContainer">
+        <div class="status-item">
+          <input type="text" class="form-control status-input" value="นักศึกษา">
+          <button type="button" class="btn btn-icon" onclick="this.parentElement.remove()" title="ลบตัวเลือก">✕</button>
+        </div>
+        <div class="status-item">
+          <input type="text" class="form-control status-input" value="อาจารย์">
+          <button type="button" class="btn btn-icon" onclick="this.parentElement.remove()" title="ลบตัวเลือก">✕</button>
+        </div>
+        <div class="status-item">
+          <input type="text" class="form-control status-input" value="บุคลากร">
+          <button type="button" class="btn btn-icon" onclick="this.parentElement.remove()" title="ลบตัวเลือก">✕</button>
+        </div>
+        <div class="status-item">
+          <input type="text" class="form-control status-input" value="บุคคลทั่วไป">
+          <button type="button" class="btn btn-icon" onclick="this.parentElement.remove()" title="ลบตัวเลือก">✕</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" id="addStatusBtn" style="margin-bottom: 1.5rem; margin-top: 0.5rem;" onclick="addStatusOption()">+ เพิ่มตัวเลือกสถานภาพ</button>
+
+      <!-- ส่วนที่ 2: คำถาม -->
+      <div class="section-title">
+        <span>คำถามประเมินความพึงพอใจ (เลือกเทมเพลตมาตรฐาน)</span>
+      </div>
+      
+      <div class="template-grid" id="templateQuestions">
+        <!-- Templates inserted by JS -->
+      </div>
+
+      <div class="section-title">
+        <span>เพิ่มคำถามที่ต้องการเอง</span>
+        <button type="button" class="btn btn-outline" onclick="addCustomQuestion()">
+          + เพิ่มคำถาม
+        </button>
+      </div>
+
+      <div class="custom-questions" id="customQuestionsContainer">
+        <!-- Custom questions inserted here -->
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="submitBtn">
+        <span id="btnText">✨ สร้างแบบประเมินความพึงพอใจ</span>
+        <div class="loader" id="loader"></div>
+      </button>
+    </form>
+
+    <div class="result-section" id="resultSection">
+      <div class="result-card">
+        <h3>🎉 สร้างแบบประเมินสำเร็จแล้ว!</h3>
+        
+        <div class="qr-container">
+          <img id="qrCodeImage" src="" alt="QR Code">
+        </div>
+
+        <div class="link-group">
+          <div class="link-item">
+            <strong>🔗 ลิงก์สำหรับส่งให้ผู้ประเมินตอบแบบสอบถาม (Published URL)</strong>
+            <a href="#" id="publishedUrl" target="_blank">กำลังโหลด...</a>
+          </div>
+          <div class="link-item">
+            <strong>✏️ ลิงก์สำหรับแก้ไขฟอร์มและดูผลลัพธ์ (Edit URL)</strong>
+            <a href="#" id="editUrl" target="_blank">กำลังโหลด...</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    พัฒนาโดย งานเทคโนโลยีสารสนเทศ วิทยาลัยชุมชนสมุทรสาคร
+  </div>
+
+  <script>
+    const standardTemplates = [
+      "ความรู้ความเข้าใจในเรื่องนี้ ก่อน การเข้าร่วมโครงการ",
+      "ความรู้ความเข้าใจในเรื่องนี้ หลัง การเข้าร่วมโครงการ",
+      "ความสามารถในการถ่ายทอดความรู้ของวิทยากร",
+      "ความชัดเจนของการตอบข้อซักถามของวิทยากร",
+      "ความเหมาะสมของสถานที่และสิ่งอำนวยความสะดวก",
+      "ความเหมาะสมของระยะเวลาในการจัดกิจกรรม",
+      "ความพึงพอใจในภาพรวมของการเข้าร่วมกิจกรรมครั้งนี้",
+      "ประโยชน์ที่ได้รับจากการเข้าร่วมกิจกรรมและสามารถนำไปปรับใช้ได้จริง"
+    ];
+
+    function initTemplates() {
+      const container = document.getElementById('templateQuestions');
+      standardTemplates.forEach((q, index) => {
+        const div = document.createElement('div');
+        div.className = 'template-card';
+        div.innerHTML = `
+          <input type="checkbox" id="tpl_${index}" value="${q}" checked>
+          <label for="tpl_${index}">${q}</label>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addCustomQuestion() {
+      const container = document.getElementById('customQuestionsContainer');
+      const row = document.createElement('div');
+      row.className = 'custom-question-row';
+      row.innerHTML = `
+        <input type="text" class="form-control custom-q-input" placeholder="พิมพ์คำถามที่ต้องการประเมิน (ให้คะแนน 1-5)">
+        <button type="button" class="btn btn-icon" onclick="this.parentElement.remove()" title="ลบคำถาม">
+          ✕
+        </button>
+      `;
+      container.appendChild(row);
+      // Focus on the new input
+      row.querySelector('input').focus();
+    }
+
+    function toggleStatusList() {
+      const isChecked = document.getElementById('toggleStatus').checked;
+      const listContainer = document.getElementById('statusListContainer');
+      const addBtn = document.getElementById('addStatusBtn');
+      if (isChecked) {
+        listContainer.classList.add('active');
+        addBtn.style.display = 'inline-flex';
+      } else {
+        listContainer.classList.remove('active');
+        addBtn.style.display = 'none';
+      }
+    }
+
+    function addStatusOption() {
+      const container = document.getElementById('statusListContainer');
+      const row = document.createElement('div');
+      row.className = 'status-item';
+      row.innerHTML = `
+        <input type="text" class="form-control status-input" placeholder="ระบุสถานภาพ">
+        <button type="button" class="btn btn-icon" onclick="this.parentElement.remove()" title="ลบตัวเลือก">✕</button>
+      `;
+      container.appendChild(row);
+      row.querySelector('input').focus();
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const btnText = document.getElementById('btnText');
+      const loader = document.getElementById('loader');
+      
+      // Gather data
+      const projectName = document.getElementById('projectName').value;
+      const eventDate = document.getElementById('eventDate').value;
+      const location = document.getElementById('location').value;
+      
+      const askGender = document.getElementById('toggleGender').checked;
+      const askAge = document.getElementById('toggleAge').checked;
+      const askStatus = document.getElementById('toggleStatus').checked;
+      
+      let statusOptions = [];
+      if (askStatus) {
+        const sInputs = document.querySelectorAll('.status-input');
+        sInputs.forEach(input => {
+          if(input.value.trim() !== '') {
+            statusOptions.push(input.value.trim());
+          }
+        });
+        if (statusOptions.length === 0) {
+          alert("กรุณาระบุตัวเลือกสถานภาพอย่างน้อย 1 ข้อ หรือปิดการถามสถานภาพ");
+          return;
+        }
+      }
+
+      let questions = [];
+      
+      // Get checked templates
+      const checkboxes = document.querySelectorAll('#templateQuestions input[type="checkbox"]:checked');
+      checkboxes.forEach(cb => questions.push(cb.value));
+      
+      // Get custom questions
+      const customInputs = document.querySelectorAll('.custom-q-input');
+      customInputs.forEach(input => {
+        if(input.value.trim() !== '') {
+          questions.push(input.value.trim());
+        }
+      });
+
+      if(questions.length === 0) {
+        alert("กรุณาเลือกหรือเพิ่มคำถามอย่างน้อย 1 ข้อ");
+        return;
+      }
+
+      const formData = {
+        projectName: projectName,
+        eventDate: eventDate,
+        location: location,
+        askGender: askGender,
+        askAge: askAge,
+        askStatus: askStatus,
+        statusOptions: statusOptions,
+        questions: questions
+      };
+
+      // Loading state
+      submitBtn.disabled = true;
+      btnText.textContent = 'กำลังสร้างแบบประเมิน...';
+      loader.style.display = 'block';
+      document.getElementById('resultSection').style.display = 'none';
+
+      // Call Google Apps Script backend
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(onSuccess)
+          .withFailureHandler(onFailure)
+          .createSatisfactionForm(formData);
+      } else {
+        // Fallback for local testing visually (mocking)
+        setTimeout(() => {
+          console.log(formData);
+          onSuccess({
+            status: 'success',
+            publishedUrl: 'https://docs.google.com/forms/d/e/mock123/viewform',
+            editUrl: 'https://docs.google.com/forms/d/mock123/edit',
+            qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=' + encodeURIComponent('https://docs.google.com/forms/d/e/mock123/viewform')
+          });
+        }, 2000);
+      }
+    }
+
+    function onSuccess(response) {
+      const submitBtn = document.getElementById('submitBtn');
+      const btnText = document.getElementById('btnText');
+      const loader = document.getElementById('loader');
+      
+      submitBtn.disabled = false;
+      btnText.textContent = '✨ สร้างแบบประเมินความพึงพอใจ';
+      loader.style.display = 'none';
+
+      if (response.status === 'success') {
+        document.getElementById('resultSection').style.display = 'block';
+        document.getElementById('qrCodeImage').src = response.qrCodeUrl;
+        
+        const pubUrl = document.getElementById('publishedUrl');
+        pubUrl.href = response.publishedUrl;
+        pubUrl.textContent = response.publishedUrl;
+        
+        const editUrl = document.getElementById('editUrl');
+        editUrl.href = response.editUrl;
+        editUrl.textContent = response.editUrl;
+
+        // Scroll to result
+        document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        alert('เกิดข้อผิดพลาด: ' + response.message);
+      }
+    }
+
+    function onFailure(error) {
+      const submitBtn = document.getElementById('submitBtn');
+      const btnText = document.getElementById('btnText');
+      const loader = document.getElementById('loader');
+      
+      submitBtn.disabled = false;
+      btnText.textContent = '✨ สร้างแบบประเมินความพึงพอใจ';
+      loader.style.display = 'none';
+      
+      alert('ไม่สามารถเชื่อมต่อกับระบบได้ กรุณาลองใหม่อีกครั้ง: ' + error);
+    }
+
+    // Initialize
+    window.onload = () => {
+      initTemplates();
+      // Set default date to today
+      document.getElementById('eventDate').valueAsDate = new Date();
+    };
+  </script>
+</body>
+</html>
